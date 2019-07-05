@@ -1,5 +1,6 @@
 import pandas as pd
 from hockeypi.cache import make_request
+from hockeypi.exceptions import TeamNotFoundException, PlayerNotFoundException
 
 def get_teams_by_year(year, raw=False, overwrite=False, verbose=False):
   '''
@@ -159,7 +160,7 @@ def get_team_id_by_name_and_year(name, year, overwrite=False, verbose=False):
   :param year: season start year (e.g. 2018-2019 season would be 2018)
   :param overwrite: overwrites cache if True
   :param verbose: shows logs if True
-  :returns: integer team id of the team identified by given name and year.
+  :returns: integer team id of the team identified by given name and year
   '''
   df = get_teams_by_year(year, overwrite=overwrite, verbose=verbose)
   
@@ -168,4 +169,23 @@ def get_team_id_by_name_and_year(name, year, overwrite=False, verbose=False):
   elif len(df[df['name'].str.lower().str.contains(name.lower())]) == 1:
     return df[df['name'].str.lower().str.contains(name.lower())]['teamId'].item()
   else:
-    raise Exception('Unique team not found')
+    raise TeamNotFoundException('Unique team not found')
+  
+def get_player_id_by_name_and_year(name, year, overwrite=False, verbose=False):
+  '''
+  Get the player id by name and playing year.
+
+  :param name: name of the player
+  :param year: year that the player was active
+  :param overwrite: overwrites cache if True
+  :param verbose: shows logs if True
+  :returns: integer player id of the team identified by given name and year
+  '''
+  df = get_all_team_roster_by_year(year, overwrite=overwrite, verbose=verbose)
+  
+  if len(df[df['fullName'].str.lower() == name.lower()]) == 1:
+    return df[df['fullName'].str.lower() == name.lower()]['playerId'].item()
+  elif len(df[df['fullName'].str.lower().str.contains(name.lower())]) == 1:
+    return df[df['fullName'].str.lower().str.contains(name.lower())]['playerId'].item()
+  else:
+    raise PlayerNotFoundException('Unique player not found')

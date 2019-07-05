@@ -6,3 +6,4 @@
 
 # Ignore cache
 cache/*
+hockeypi/__pycache__/*
