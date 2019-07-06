@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 from hockeypi.cache import make_request
-from hockeypi.exceptions import UnknownPlayerException
+from hockeypi.exceptions import PlayerNotFoundException
 
 def get_player_info(player_id, raw=False, overwrite=False, verbose=False):
   '''
@@ -37,7 +37,7 @@ def get_player_statistics_by_year(player_id, year, raw=False, overwrite=False, v
   response = make_request(url, overwrite=overwrite, verbose=verbose)
   
   if 'stats' not in response.keys() or len(response['stats'][0]['splits']) == 0:
-    raise UnknownPlayerException(f'No statistics available for player \
+    raise PlayerNotFoundException(f'No statistics available for player \
       {player_id} for year {year}')
 
   if raw: return response['stats'][0]['splits'][0]['stat']
@@ -62,7 +62,7 @@ def get_player_game_level_statistics_by_year(player_id, year, raw=False, overwri
   response = make_request(url, overwrite=overwrite, verbose=verbose)
 
   if 'stats' not in response.keys() or len(response['stats'][0]['splits']) == 0:
-    raise UnknownPlayerException(f'No game level statistics available for player \
+    raise PlayerNotFoundException(f'No game level statistics available for player \
       {player_id} for year {year}')
 
   if raw: return response['stats'][0]['splits']
@@ -105,7 +105,7 @@ def get_player_active_years(player_id, verbose=False, overwrite=False):
       df = get_player_statistics_by_year(player_id, year, \
         verbose=verbose, overwrite=overwrite)
       years.append(year)
-    except UnknownPlayerException: pass
+    except PlayerNotFoundException: pass
     except: raise
   return years
 

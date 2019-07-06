@@ -4,8 +4,11 @@ import os
 
 def make_request(url, overwrite=False, verbose=False):
   '''
-  Make a request and cache the data. 
-  If data is in cache, retrieve data from cache.
+  Retrieves response from the given url, either from web or cache.
+  
+  :param overwrite: overwrites cache if True
+  :param verbose: shows logs if True
+  :returns: web response for the given url
   '''
   filename = 'cache/' + encode_url(url) + '.json'
 
@@ -16,21 +19,29 @@ def make_request(url, overwrite=False, verbose=False):
   # cache hit - retrieve from cache.
   if os.path.isfile(filename) and not overwrite:
     if verbose:
-      print('Cache Hit for ' + url)
+      print(f'Cache Hit for {url}')
     with open(filename) as f:
       return json.load(f)
-      
+
   # cache miss - make request, and save to cache. 
   response = requests.get(url).json()
   if verbose:
-    print('Cache Miss for ' + url)
+    if overwrite:
+      print(f'Overwriting cache for {url}')
+    else:
+      print(f'Cache Miss for {url}')
+
+  # write to cache.
   with open(filename, 'w') as f:
     json.dump(response, f)
   return response
 
 def encode_url(url):
   '''
-  Encode url for os compliant filenames.
+  Create unique fingerprint for each url that is os-compliant.
+  
+  :param url: url to encode
+  :returns: os-compliant filename for a url
   '''
   encoding_dict = {':' : ';', '/' : '#', '?' : '$'}
   encoded_url = ''
