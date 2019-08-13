@@ -27,6 +27,20 @@ def get_all_games_for_team_by_year(team_id, year, raw=False, overwrite=False, ve
   df['awayId'] = df['games'].apply(lambda x : x[0]['teams']['away']['team']['id'])
   df['homeScore'] = df['games'].apply(lambda x : x[0]['teams']['home']['score'])
   df['awayScore'] = df['games'].apply(lambda x : x[0]['teams']['away']['score'])
+  df['homeRecordWin'] = df['games'].apply(lambda x : x[0]['teams']['home']['leagueRecord']['wins'])
+  df['homeRecordLoss'] = df['games'].apply(lambda x : x[0]['teams']['home']['leagueRecord']['losses'])
+  df['homeRecordOT'] = df['games'].apply(lambda x : x[0]['teams']['home']['leagueRecord']['ot'] \
+    if x[0]['gameType'] == 'R' and year >= 2005 else 0)
+  df['awayRecordWin'] = df['games'].apply(lambda x : x[0]['teams']['away']['leagueRecord']['wins'])
+  df['awayRecordLoss'] = df['games'].apply(lambda x : x[0]['teams']['away']['leagueRecord']['losses'])
+  df['awayRecordOT'] = df['games'].apply(lambda x : x[0]['teams']['away']['leagueRecord']['ot'] \
+    if x[0]['gameType'] == 'R' and year >= 2005 else 0)
+
+  df['homeRecordTie'] = df['games'].apply(lambda x : x[0]['teams']['home']['leagueRecord']['ties'] \
+    if x[0]['gameType'] == 'R' and year < 2005 else 0)
+  df['awayRecordTie'] = df['games'].apply(lambda x : x[0]['teams']['away']['leagueRecord']['ties'] \
+    if x[0]['gameType'] == 'R' and year < 2005 else 0)
+
   df['link'] = df['games'].apply(lambda x : x[0]['link'])
   df.drop(['games'], axis=1, inplace=True)
   df.insert(loc=0, column='teamId', value=team_id)
